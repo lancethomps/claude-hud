@@ -8,7 +8,7 @@ Real-time statusline showing context usage, active tools, running agents, and to
 
 **Step 1: Add the marketplace**
 ```
-/plugin marketplace add jarrodwatts/claude-hud
+/plugin marketplace add lancethomps/claude-hud
 ```
 
 **Step 2: Install the plugin**
@@ -44,7 +44,7 @@ If not installed or outdated, direct user to https://claude.ai/code
 
 Run this command in Claude Code:
 ```
-/plugin marketplace add jarrodwatts/claude-hud
+/plugin marketplace add lancethomps/claude-hud
 ```
 
 ### Step 3: Install the Plugin
@@ -76,7 +76,7 @@ Ask the user: "Would you like to star the repository to support the project?"
 
 Only if they explicitly agree, run:
 ```bash
-gh repo star jarrodwatts/claude-hud
+gh repo star lancethomps/claude-hud
 ```
 
 Never run this automatically without user consent.
@@ -92,7 +92,7 @@ Technical documentation for agents who need to understand, modify, or debug Clau
 <plugin>
   <name>Claude HUD</name>
   <description>Real-time statusline showing context usage, active tools, running agents, and todo progress. Always visible below your input, zero config required.</description>
-  <repository>github.com/jarrodwatts/claude-hud</repository>
+  <repository>github.com/lancethomps/claude-hud</repository>
   <license>MIT</license>
 </plugin>
 
@@ -249,7 +249,7 @@ Technical documentation for agents who need to understand, modify, or debug Clau
 
 <development>
   <setup>
-    git clone https://github.com/jarrodwatts/claude-hud
+    git clone https://github.com/lancethomps/claude-hud
     cd claude-hud
     npm ci
     npm run build
@@ -294,7 +294,7 @@ Technical documentation for agents who need to understand, modify, or debug Clau
 <troubleshooting>
   <issue name="Statusline not appearing">
     <cause>Plugin not installed or statusLine not configured</cause>
-    <solution>Run: /plugin marketplace add jarrodwatts/claude-hud</solution>
+    <solution>Run: /plugin marketplace add lancethomps/claude-hud</solution>
     <solution>Run: /plugin install claude-hud</solution>
     <solution>Run: /claude-hud:setup</solution>
     <solution>Ensure Claude Code is v1.0.80 or later</solution>
