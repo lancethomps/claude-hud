@@ -3,7 +3,7 @@ export type AutocompactBufferMode = 'enabled' | 'disabled';
 export interface HudConfig {
     lineLayout: LineLayoutType;
     showSeparators: boolean;
-    pathLevels: 1 | 2 | 3 | 4 | 5;
+    pathLevels: -1 | 1 | 2 | 3 | 4 | 5;
     gitStatus: {
         enabled: boolean;
         showDirty: boolean;

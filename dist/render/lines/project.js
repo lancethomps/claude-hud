@@ -5,7 +5,7 @@ export function renderProjectLine(ctx) {
     }
     const segments = ctx.stdin.cwd.split(/[/\\]/).filter(Boolean);
     const pathLevels = ctx.config?.pathLevels ?? 1;
-    const projectPath = segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
+    const projectPath = pathLevels === -1 ? ctx.stdin.cwd : segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
     let gitPart = '';
     const gitConfig = ctx.config?.gitStatus;
     const showGit = gitConfig?.enabled ?? true;

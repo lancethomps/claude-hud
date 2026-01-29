@@ -9,7 +9,7 @@ export type AutocompactBufferMode = 'enabled' | 'disabled';
 export interface HudConfig {
   lineLayout: LineLayoutType;
   showSeparators: boolean;
-  pathLevels: 1 | 2 | 3 | 4 | 5;
+  pathLevels: -1 | 1 | 2 | 3 | 4 | 5;
   gitStatus: {
     enabled: boolean;
     showDirty: boolean;
@@ -65,8 +65,8 @@ export function getConfigPath(): string {
   return path.join(homeDir, '.claude', 'plugins', 'claude-hud', 'config.json');
 }
 
-function validatePathLevels(value: unknown): value is 1 | 2 | 3 | 4 | 5 {
-  return value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
+function validatePathLevels(value: unknown): value is -1 | 1 | 2 | 3 | 4 | 5 {
+  return value === -1 || value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
 }
 
 function validateLineLayout(value: unknown): value is LineLayoutType {

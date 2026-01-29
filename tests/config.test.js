@@ -7,8 +7,8 @@ import * as os from 'node:os';
 test('loadConfig returns valid config structure', async () => {
   const config = await loadConfig();
 
-  // pathLevels must be 1, 2, 3, 4, or 5
-  assert.ok([1, 2, 3, 4, 5].includes(config.pathLevels), 'pathLevels should be 1, 2, 3, 4, or 5');
+  // pathLevels must be -1, 1, 2, 3, 4, or 5
+  assert.ok([-1, 1, 2, 3, 4, 5].includes(config.pathLevels), 'pathLevels should be -1, 1, 2, 3, 4, or 5');
 
   // lineLayout must be valid
   const validLineLayouts = ['compact', 'expanded'];

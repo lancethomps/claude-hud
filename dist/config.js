@@ -32,7 +32,7 @@ export function getConfigPath() {
     return path.join(homeDir, '.claude', 'plugins', 'claude-hud', 'config.json');
 }
 function validatePathLevels(value) {
-    return value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
+    return value === -1 || value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
 }
 function validateLineLayout(value) {
     return value === 'compact' || value === 'expanded';
