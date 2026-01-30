@@ -1,5 +1,5 @@
 export const RESET = '\x1b[0m';
-const DIM = '\x1b[2m';
+const DIM = '\x1b[37m';
 const RED = '\x1b[1;31m';
 const GREEN = '\x1b[1;32m';
 const YELLOW = '\x1b[1;33m';
