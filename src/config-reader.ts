@@ -12,6 +12,13 @@ export interface ConfigCounts {
   hooksCount: number;
 }
 
+export interface ConfigDetails {
+  claudeMdFiles: string[];
+  rulesFiles: string[];
+  mcpServers: string[];
+  hooks: string[];
+}
+
 // Valid keys for disabled MCP arrays in config files
 type DisabledMcpKey = 'disabledMcpServers' | 'disabledMcpjsonServers';
 
@@ -47,54 +54,49 @@ function getDisabledMcpServers(filePath: string, key: DisabledMcpKey): Set<strin
   return new Set();
 }
 
-function countMcpServersInFile(filePath: string, excludeFrom?: string): number {
-  const servers = getMcpServerNames(filePath);
-  if (excludeFrom) {
-    const exclude = getMcpServerNames(excludeFrom);
-    for (const name of exclude) {
-      servers.delete(name);
-    }
-  }
-  return servers.size;
-}
-
-function countHooksInFile(filePath: string): number {
-  if (!fs.existsSync(filePath)) return 0;
+function getHookNames(filePath: string): string[] {
+  if (!fs.existsSync(filePath)) return [];
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const config = JSON.parse(content);
     if (config.hooks && typeof config.hooks === 'object') {
-      return Object.keys(config.hooks).length;
+      return Object.keys(config.hooks);
     }
   } catch (error) {
     debug(`Failed to read hooks from ${filePath}:`, error);
   }
-  return 0;
+  return [];
 }
 
-function countRulesInDir(rulesDir: string): number {
-  if (!fs.existsSync(rulesDir)) return 0;
-  let count = 0;
+function getRulesInDir(rulesDir: string, basePath = ''): string[] {
+  if (!fs.existsSync(rulesDir)) return [];
+  const rules: string[] = [];
   try {
     const entries = fs.readdirSync(rulesDir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(rulesDir, entry.name);
+      const relativePath = basePath ? `${basePath}/${entry.name}` : entry.name;
       if (entry.isDirectory()) {
-        count += countRulesInDir(fullPath);
+        rules.push(...getRulesInDir(fullPath, relativePath));
       } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        count++;
+        rules.push(relativePath);
       }
     }
   } catch (error) {
     debug(`Failed to read rules from ${rulesDir}:`, error);
   }
-  return count;
+  return rules;
 }
 
-export async function countConfigs(cwd?: string): Promise<ConfigCounts> {
-  let claudeMdCount = 0;
-  let rulesCount = 0;
-  let hooksCount = 0;
+export interface ConfigResult {
+  counts: ConfigCounts;
+  details: ConfigDetails;
+}
+
+export async function countConfigs(cwd?: string): Promise<ConfigResult> {
+  const claudeMdFiles: string[] = [];
+  const rulesFiles: string[] = [];
+  const hooks: string[] = [];
 
   const homeDir = os.homedir();
   const claudeDir = path.join(homeDir, '.claude');
@@ -107,18 +109,23 @@ export async function countConfigs(cwd?: string): Promise<ConfigCounts> {
 
   // ~/.claude/CLAUDE.md
   if (fs.existsSync(path.join(claudeDir, 'CLAUDE.md'))) {
-    claudeMdCount++;
+    claudeMdFiles.push('~/.claude/CLAUDE.md');
   }
 
   // ~/.claude/rules/*.md
-  rulesCount += countRulesInDir(path.join(claudeDir, 'rules'));
+  const userRules = getRulesInDir(path.join(claudeDir, 'rules'));
+  for (const rule of userRules) {
+    rulesFiles.push(`~/.claude/rules/${rule}`);
+  }
 
   // ~/.claude/settings.json (MCPs and hooks)
   const userSettings = path.join(claudeDir, 'settings.json');
   for (const name of getMcpServerNames(userSettings)) {
     userMcpServers.add(name);
   }
-  hooksCount += countHooksInFile(userSettings);
+  for (const hook of getHookNames(userSettings)) {
+    hooks.push(hook);
+  }
 
   // ~/.claude.json (additional user-scope MCPs)
   const userClaudeJson = path.join(homeDir, '.claude.json');
@@ -137,26 +144,29 @@ export async function countConfigs(cwd?: string): Promise<ConfigCounts> {
   if (cwd) {
     // {cwd}/CLAUDE.md
     if (fs.existsSync(path.join(cwd, 'CLAUDE.md'))) {
-      claudeMdCount++;
+      claudeMdFiles.push('CLAUDE.md');
     }
 
     // {cwd}/CLAUDE.local.md
     if (fs.existsSync(path.join(cwd, 'CLAUDE.local.md'))) {
-      claudeMdCount++;
+      claudeMdFiles.push('CLAUDE.local.md');
     }
 
     // {cwd}/.claude/CLAUDE.md (alternative location)
     if (fs.existsSync(path.join(cwd, '.claude', 'CLAUDE.md'))) {
-      claudeMdCount++;
+      claudeMdFiles.push('.claude/CLAUDE.md');
     }
 
     // {cwd}/.claude/CLAUDE.local.md
     if (fs.existsSync(path.join(cwd, '.claude', 'CLAUDE.local.md'))) {
-      claudeMdCount++;
+      claudeMdFiles.push('.claude/CLAUDE.local.md');
     }
 
     // {cwd}/.claude/rules/*.md (recursive)
-    rulesCount += countRulesInDir(path.join(cwd, '.claude', 'rules'));
+    const projectRules = getRulesInDir(path.join(cwd, '.claude', 'rules'));
+    for (const rule of projectRules) {
+      rulesFiles.push(`.claude/rules/${rule}`);
+    }
 
     // {cwd}/.mcp.json (project MCP config) - tracked separately for disabled filtering
     const mcpJsonServers = getMcpServerNames(path.join(cwd, '.mcp.json'));
@@ -166,14 +176,22 @@ export async function countConfigs(cwd?: string): Promise<ConfigCounts> {
     for (const name of getMcpServerNames(projectSettings)) {
       projectMcpServers.add(name);
     }
-    hooksCount += countHooksInFile(projectSettings);
+    for (const hook of getHookNames(projectSettings)) {
+      if (!hooks.includes(hook)) {
+        hooks.push(hook);
+      }
+    }
 
     // {cwd}/.claude/settings.local.json (local project settings)
     const localSettings = path.join(cwd, '.claude', 'settings.local.json');
     for (const name of getMcpServerNames(localSettings)) {
       projectMcpServers.add(name);
     }
-    hooksCount += countHooksInFile(localSettings);
+    for (const hook of getHookNames(localSettings)) {
+      if (!hooks.includes(hook)) {
+        hooks.push(hook);
+      }
+    }
 
     // Get disabled .mcp.json servers from settings.local.json
     const disabledMcpJsonServers = getDisabledMcpServers(localSettings, 'disabledMcpjsonServers');
@@ -187,11 +205,23 @@ export async function countConfigs(cwd?: string): Promise<ConfigCounts> {
     }
   }
 
-  // Total MCP count = user servers + project servers
-  // Note: Deduplication only occurs within each scope, not across scopes.
-  // A server with the same name in both user and project scope counts as 2 (separate configs).
-  const mcpCount = userMcpServers.size + projectMcpServers.size;
+  // Combine MCP servers from both scopes
+  const mcpServers = [...userMcpServers, ...projectMcpServers];
 
-  return { claudeMdCount, rulesCount, mcpCount, hooksCount };
+  const counts: ConfigCounts = {
+    claudeMdCount: claudeMdFiles.length,
+    rulesCount: rulesFiles.length,
+    mcpCount: mcpServers.length,
+    hooksCount: hooks.length,
+  };
+
+  const details: ConfigDetails = {
+    claudeMdFiles,
+    rulesFiles,
+    mcpServers,
+    hooks,
+  };
+
+  return { counts, details };
 }
 

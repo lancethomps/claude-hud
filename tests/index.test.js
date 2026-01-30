@@ -35,7 +35,7 @@ test('main logs an error when dependencies throw', async () => {
       throw new Error('boom');
     },
     parseTranscript: async () => ({ tools: [], agents: [], todos: [] }),
-    countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+    countConfigs: async () => ({ counts: { claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }, details: { claudeMdFiles: [], rulesFiles: [], mcpServers: [], hooks: [] } }),
     getGitBranch: async () => null,
     getUsage: async () => null,
     render: () => {},
@@ -53,7 +53,7 @@ test('main logs unknown error for non-Error throws', async () => {
       throw 'boom';
     },
     parseTranscript: async () => ({ tools: [], agents: [], todos: [] }),
-    countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+    countConfigs: async () => ({ counts: { claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }, details: { claudeMdFiles: [], rulesFiles: [], mcpServers: [], hooks: [] } }),
     getGitBranch: async () => null,
     getUsage: async () => null,
     render: () => {},
@@ -97,7 +97,7 @@ test('main executes the happy path with default dependencies', async () => {
         context_window: { context_window_size: 100, current_usage: { input_tokens: 90 } },
       }),
       parseTranscript: async () => ({ tools: [], agents: [], todos: [], sessionStart: new Date(0) }),
-      countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+      countConfigs: async () => ({ counts: { claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }, details: { claudeMdFiles: [], rulesFiles: [], mcpServers: [], hooks: [] } }),
       getGitBranch: async () => null,
       getUsage: async () => null,
       render: (ctx) => {
@@ -121,7 +121,7 @@ test('main includes git status in render context', async () => {
       cwd: '/some/path',
     }),
     parseTranscript: async () => ({ tools: [], agents: [], todos: [] }),
-    countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+    countConfigs: async () => ({ counts: { claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }, details: { claudeMdFiles: [], rulesFiles: [], mcpServers: [], hooks: [] } }),
     getGitStatus: async () => ({ branch: 'feature/test', isDirty: false, ahead: 0, behind: 0 }),
     getUsage: async () => null,
     loadConfig: async () => ({
@@ -129,7 +129,7 @@ test('main includes git status in render context', async () => {
       showSeparators: false,
       pathLevels: 1,
       gitStatus: { enabled: true, showDirty: true, showAheadBehind: false, showFileStats: false },
-      display: { showModel: true, showContextBar: true, showConfigCounts: true, showDuration: true, showTokenBreakdown: true, showUsage: true, showTools: true, showAgents: true, showTodos: true, autocompactBuffer: 'enabled', usageThreshold: 0, environmentThreshold: 0 },
+      display: { showModel: true, showContextBar: true, showConfigCounts: true, showConfigFiles: false, showDuration: true, showTokenBreakdown: true, showUsage: true, showTools: true, showAgents: true, showTodos: true, autocompactBuffer: 'enabled', usageThreshold: 0, environmentThreshold: 0 },
     }),
     render: (ctx) => {
       renderedContext = ctx;
@@ -156,7 +156,7 @@ test('main includes usageData in render context', async () => {
       context_window: { context_window_size: 100, current_usage: { input_tokens: 10 } },
     }),
     parseTranscript: async () => ({ tools: [], agents: [], todos: [] }),
-    countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+    countConfigs: async () => ({ counts: { claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }, details: { claudeMdFiles: [], rulesFiles: [], mcpServers: [], hooks: [] } }),
     getGitBranch: async () => null,
     getUsage: async () => mockUsageData,
     render: (ctx) => {

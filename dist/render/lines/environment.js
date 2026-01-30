@@ -9,18 +9,40 @@ export function renderEnvironmentLine(ctx) {
     if (totalCounts === 0 || totalCounts < threshold) {
         return null;
     }
+    const verbose = display?.showConfigFiles ?? false;
     const parts = [];
     if (ctx.claudeMdCount > 0) {
-        parts.push(`${ctx.claudeMdCount} CLAUDE.md`);
+        if (verbose) {
+            parts.push(ctx.claudeMdFiles.join(', '));
+        }
+        else {
+            parts.push(`${ctx.claudeMdCount} CLAUDE.md`);
+        }
     }
     if (ctx.rulesCount > 0) {
-        parts.push(`${ctx.rulesCount} rules`);
+        if (verbose) {
+            const ruleNames = ctx.rulesFiles.map(f => f.replace(/^.*\//, '').replace(/\.md$/, ''));
+            parts.push(`rules: ${ruleNames.join(', ')}`);
+        }
+        else {
+            parts.push(`${ctx.rulesCount} rules`);
+        }
     }
     if (ctx.mcpCount > 0) {
-        parts.push(`${ctx.mcpCount} MCPs`);
+        if (verbose) {
+            parts.push(`MCPs: ${ctx.mcpServers.join(', ')}`);
+        }
+        else {
+            parts.push(`${ctx.mcpCount} MCPs`);
+        }
     }
     if (ctx.hooksCount > 0) {
-        parts.push(`${ctx.hooksCount} hooks`);
+        if (verbose) {
+            parts.push(`hooks: ${ctx.hooks.join(', ')}`);
+        }
+        else {
+            parts.push(`${ctx.hooksCount} hooks`);
+        }
     }
     if (parts.length === 0) {
         return null;

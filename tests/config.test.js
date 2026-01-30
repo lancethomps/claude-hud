@@ -28,6 +28,7 @@ test('loadConfig returns valid config structure', async () => {
   assert.equal(typeof config.display.showModel, 'boolean');
   assert.equal(typeof config.display.showContextBar, 'boolean');
   assert.equal(typeof config.display.showConfigCounts, 'boolean');
+  assert.equal(typeof config.display.showConfigFiles, 'boolean');
   assert.equal(typeof config.display.showDuration, 'boolean');
   assert.equal(typeof config.display.showTokenBreakdown, 'boolean');
   assert.equal(typeof config.display.showUsage, 'boolean');

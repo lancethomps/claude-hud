@@ -14,6 +14,7 @@ export interface HudConfig {
         showModel: boolean;
         showContextBar: boolean;
         showConfigCounts: boolean;
+        showConfigFiles: boolean;
         showDuration: boolean;
         showTokenBreakdown: boolean;
         showUsage: boolean;

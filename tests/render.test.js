@@ -25,6 +25,10 @@ function baseContext() {
     rulesCount: 0,
     mcpCount: 0,
     hooksCount: 0,
+    claudeMdFiles: [],
+    rulesFiles: [],
+    mcpServers: [],
+    hooks: [],
     sessionDuration: '',
     gitStatus: null,
     usageData: null,
@@ -33,7 +37,7 @@ function baseContext() {
       showSeparators: false,
       pathLevels: 1,
       gitStatus: { enabled: true, showDirty: true, showAheadBehind: false, showFileStats: false },
-      display: { showModel: true, showContextBar: true, showConfigCounts: true, showDuration: true, showTokenBreakdown: true, showUsage: true, usageBarEnabled: false, showTools: true, showAgents: true, showTodos: true, autocompactBuffer: 'enabled', usageThreshold: 0, environmentThreshold: 0 },
+      display: { showModel: true, showContextBar: true, showConfigCounts: true, showConfigFiles: false, showDuration: true, showTokenBreakdown: true, showUsage: true, usageBarEnabled: false, showTools: true, showAgents: true, showTodos: true, autocompactBuffer: 'enabled', usageThreshold: 0, environmentThreshold: 0 },
     },
   };
 }
@@ -95,11 +99,34 @@ test('renderSessionLine includes config counts when present', () => {
   ctx.rulesCount = 2;
   ctx.mcpCount = 3;
   ctx.hooksCount = 4;
+  ctx.claudeMdFiles = ['CLAUDE.md'];
+  ctx.rulesFiles = ['~/.claude/rules/comments.md', '.claude/rules/test.md'];
+  ctx.mcpServers = ['slack', 'linear', 'figma'];
+  ctx.hooks = ['PreToolUse', 'PostToolUse', 'Stop', 'Notification'];
   const line = renderSessionLine(ctx);
   assert.ok(line.includes('CLAUDE.md'));
   assert.ok(line.includes('rules'));
   assert.ok(line.includes('MCPs'));
   assert.ok(line.includes('hooks'));
+});
+
+test('renderSessionLine displays config file names when showConfigFiles is true', () => {
+  const ctx = baseContext();
+  ctx.stdin.cwd = '/tmp/my-project';
+  ctx.claudeMdCount = 2;
+  ctx.rulesCount = 2;
+  ctx.mcpCount = 3;
+  ctx.hooksCount = 2;
+  ctx.claudeMdFiles = ['~/.claude/CLAUDE.md', 'CLAUDE.md'];
+  ctx.rulesFiles = ['~/.claude/rules/comments.md', '.claude/rules/test.md'];
+  ctx.mcpServers = ['slack', 'linear', 'figma'];
+  ctx.hooks = ['PreToolUse', 'PostToolUse'];
+  ctx.config.display.showConfigFiles = true;
+  const line = renderSessionLine(ctx);
+  assert.ok(line.includes('~/.claude/CLAUDE.md'), 'should show CLAUDE.md file paths');
+  assert.ok(line.includes('rules: comments, test'), 'should show rule names without .md extension');
+  assert.ok(line.includes('MCPs: slack, linear, figma'), 'should show MCP server names');
+  assert.ok(line.includes('hooks: PreToolUse, PostToolUse'), 'should show hook names');
 });
 
 test('renderSessionLine displays project name from POSIX cwd', () => {

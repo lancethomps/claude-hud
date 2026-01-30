@@ -20,6 +20,7 @@ export interface HudConfig {
     showModel: boolean;
     showContextBar: boolean;
     showConfigCounts: boolean;
+    showConfigFiles: boolean;
     showDuration: boolean;
     showTokenBreakdown: boolean;
     showUsage: boolean;
@@ -47,6 +48,7 @@ export const DEFAULT_CONFIG: HudConfig = {
     showModel: true,
     showContextBar: true,
     showConfigCounts: true,
+    showConfigFiles: false,
     showDuration: true,
     showTokenBreakdown: true,
     showUsage: true,
@@ -61,6 +63,9 @@ export const DEFAULT_CONFIG: HudConfig = {
 };
 
 export function getConfigPath(): string {
+  if (process.env.CLAUDE_HUB_CONFIG_FILE) {
+    return process.env.CLAUDE_HUB_CONFIG_FILE;
+  }
   const homeDir = os.homedir();
   return path.join(homeDir, '.claude', 'plugins', 'claude-hud', 'config.json');
 }
@@ -143,6 +148,9 @@ function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     showConfigCounts: typeof migrated.display?.showConfigCounts === 'boolean'
       ? migrated.display.showConfigCounts
       : DEFAULT_CONFIG.display.showConfigCounts,
+    showConfigFiles: typeof migrated.display?.showConfigFiles === 'boolean'
+      ? migrated.display.showConfigFiles
+      : DEFAULT_CONFIG.display.showConfigFiles,
     showDuration: typeof migrated.display?.showDuration === 'boolean'
       ? migrated.display.showDuration
       : DEFAULT_CONFIG.display.showDuration,

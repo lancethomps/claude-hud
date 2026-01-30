@@ -79,6 +79,10 @@ export interface RenderContext {
   rulesCount: number;
   mcpCount: number;
   hooksCount: number;
+  claudeMdFiles: string[];
+  rulesFiles: string[];
+  mcpServers: string[];
+  hooks: string[];
   sessionDuration: string;
   gitStatus: GitStatus | null;
   usageData: UsageData | null;

@@ -351,11 +351,16 @@ test('countConfigs honors project and global config locations', async () => {
     await writeFile(path.join(projectDir, '.claude', 'settings.local.json'), '{bad json', 'utf8');
     await writeFile(path.join(projectDir, '.mcp.json'), JSON.stringify({ mcpServers: { four: {} } }), 'utf8');
 
-    const counts = await countConfigs(projectDir);
+    const { counts, details } = await countConfigs(projectDir);
     assert.equal(counts.claudeMdCount, 5);
     assert.equal(counts.rulesCount, 3);
     assert.equal(counts.mcpCount, 4);
     assert.equal(counts.hooksCount, 2);
+    // Verify details arrays match counts
+    assert.equal(details.claudeMdFiles.length, 5);
+    assert.equal(details.rulesFiles.length, 3);
+    assert.equal(details.mcpServers.length, 4);
+    assert.equal(details.hooks.length, 2);
   } finally {
     process.env.HOME = originalHome;
     await rm(homeDir, { recursive: true, force: true });
@@ -383,7 +388,7 @@ test('countConfigs excludes disabled user-scope MCPs', async () => {
       'utf8'
     );
 
-    const counts = await countConfigs();
+    const { counts } = await countConfigs();
     assert.equal(counts.mcpCount, 2); // 3 - 1 disabled = 2
   } finally {
     process.env.HOME = originalHome;
@@ -414,7 +419,7 @@ test('countConfigs excludes disabled project .mcp.json servers', async () => {
       'utf8'
     );
 
-    const counts = await countConfigs(projectDir);
+    const { counts } = await countConfigs(projectDir);
     assert.equal(counts.mcpCount, 2); // 4 - 2 disabled = 2
   } finally {
     process.env.HOME = originalHome;
@@ -443,7 +448,7 @@ test('countConfigs handles all MCPs disabled', async () => {
       'utf8'
     );
 
-    const counts = await countConfigs();
+    const { counts } = await countConfigs();
     assert.equal(counts.mcpCount, 0); // All disabled
   } finally {
     process.env.HOME = originalHome;
@@ -461,7 +466,7 @@ test('countConfigs tolerates rule directory read errors', async () => {
   fs.chmodSync(rulesDir, 0);
 
   try {
-    const counts = await countConfigs();
+    const { counts } = await countConfigs();
     assert.equal(counts.rulesCount, 0);
   } finally {
     fs.chmodSync(rulesDir, 0o755);
@@ -490,7 +495,7 @@ test('countConfigs ignores non-string values in disabledMcpServers', async () =>
       'utf8'
     );
 
-    const counts = await countConfigs();
+    const { counts } = await countConfigs();
     assert.equal(counts.mcpCount, 2); // Only 'server2' disabled, server1 and server3 remain
   } finally {
     process.env.HOME = originalHome;
@@ -522,7 +527,7 @@ test('countConfigs counts same-named servers in different scopes separately', as
       'utf8'
     );
 
-    const counts = await countConfigs(projectDir);
+    const { counts } = await countConfigs(projectDir);
     // 'shared-server' counted in BOTH scopes (user + project) = 4 total
     assert.equal(counts.mcpCount, 4);
   } finally {
@@ -552,7 +557,7 @@ test('countConfigs uses case-sensitive matching for disabled servers', async () 
       'utf8'
     );
 
-    const counts = await countConfigs();
+    const { counts } = await countConfigs();
     // Both servers should still be enabled (case mismatch means not disabled)
     assert.equal(counts.mcpCount, 2);
   } finally {
@@ -589,8 +594,8 @@ test('Issue #3: MCP count updates correctly when servers are disabled', async ()
     );
 
     // Scenario 1: No servers disabled - should show 6
-    let counts = await countConfigs();
-    assert.equal(counts.mcpCount, 6, 'Should show all 6 MCPs when none disabled');
+    let result = await countConfigs();
+    assert.equal(result.counts.mcpCount, 6, 'Should show all 6 MCPs when none disabled');
 
     // Scenario 2: 1 server disabled - should show 5 (this was the initial bug report state)
     await writeFile(
@@ -608,8 +613,8 @@ test('Issue #3: MCP count updates correctly when servers are disabled', async ()
       }),
       'utf8'
     );
-    counts = await countConfigs();
-    assert.equal(counts.mcpCount, 5, 'Should show 5 MCPs when 1 is disabled');
+    result = await countConfigs();
+    assert.equal(result.counts.mcpCount, 5, 'Should show 5 MCPs when 1 is disabled');
 
     // Scenario 3: ALL servers disabled - should show 0 (this was the main bug)
     await writeFile(
@@ -627,8 +632,8 @@ test('Issue #3: MCP count updates correctly when servers are disabled', async ()
       }),
       'utf8'
     );
-    counts = await countConfigs();
-    assert.equal(counts.mcpCount, 0, 'Should show 0 MCPs when all are disabled');
+    result = await countConfigs();
+    assert.equal(result.counts.mcpCount, 0, 'Should show 0 MCPs when all are disabled');
   } finally {
     process.env.HOME = originalHome;
     await rm(homeDir, { recursive: true, force: true });

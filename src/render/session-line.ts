@@ -96,22 +96,40 @@ export function renderSessionLine(ctx: RenderContext): string {
   if (display?.showConfigCounts !== false) {
     const totalCounts = ctx.claudeMdCount + ctx.rulesCount + ctx.mcpCount + ctx.hooksCount;
     const envThreshold = display?.environmentThreshold ?? 0;
+    const verbose = display?.showConfigFiles ?? false;
 
     if (totalCounts > 0 && totalCounts >= envThreshold) {
       if (ctx.claudeMdCount > 0) {
-        parts.push(dim(`${ctx.claudeMdCount} CLAUDE.md`));
+        if (verbose) {
+          parts.push(dim(ctx.claudeMdFiles.join(', ')));
+        } else {
+          parts.push(dim(`${ctx.claudeMdCount} CLAUDE.md`));
+        }
       }
 
       if (ctx.rulesCount > 0) {
-        parts.push(dim(`${ctx.rulesCount} rules`));
+        if (verbose) {
+          const ruleNames = ctx.rulesFiles.map(f => f.replace(/^.*\//, '').replace(/\.md$/, ''));
+          parts.push(dim(`rules: ${ruleNames.join(', ')}`));
+        } else {
+          parts.push(dim(`${ctx.rulesCount} rules`));
+        }
       }
 
       if (ctx.mcpCount > 0) {
-        parts.push(dim(`${ctx.mcpCount} MCPs`));
+        if (verbose) {
+          parts.push(dim(`MCPs: ${ctx.mcpServers.join(', ')}`));
+        } else {
+          parts.push(dim(`${ctx.mcpCount} MCPs`));
+        }
       }
 
       if (ctx.hooksCount > 0) {
-        parts.push(dim(`${ctx.hooksCount} hooks`));
+        if (verbose) {
+          parts.push(dim(`hooks: ${ctx.hooks.join(', ')}`));
+        } else {
+          parts.push(dim(`${ctx.hooksCount} hooks`));
+        }
       }
     }
   }

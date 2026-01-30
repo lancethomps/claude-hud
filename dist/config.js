@@ -15,6 +15,7 @@ export const DEFAULT_CONFIG = {
         showModel: true,
         showContextBar: true,
         showConfigCounts: true,
+        showConfigFiles: false,
         showDuration: true,
         showTokenBreakdown: true,
         showUsage: true,
@@ -28,6 +29,9 @@ export const DEFAULT_CONFIG = {
     },
 };
 export function getConfigPath() {
+    if (process.env.CLAUDE_HUB_CONFIG_FILE) {
+        return process.env.CLAUDE_HUB_CONFIG_FILE;
+    }
     const homeDir = os.homedir();
     return path.join(homeDir, '.claude', 'plugins', 'claude-hud', 'config.json');
 }
@@ -95,6 +99,9 @@ function mergeConfig(userConfig) {
         showConfigCounts: typeof migrated.display?.showConfigCounts === 'boolean'
             ? migrated.display.showConfigCounts
             : DEFAULT_CONFIG.display.showConfigCounts,
+        showConfigFiles: typeof migrated.display?.showConfigFiles === 'boolean'
+            ? migrated.display.showConfigFiles
+            : DEFAULT_CONFIG.display.showConfigFiles,
         showDuration: typeof migrated.display?.showDuration === 'boolean'
             ? migrated.display.showDuration
             : DEFAULT_CONFIG.display.showDuration,
