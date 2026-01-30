@@ -20,7 +20,7 @@ export function renderEnvironmentLine(ctx: RenderContext): string | null {
 
   if (ctx.claudeMdCount > 0) {
     if (verbose) {
-      parts.push(ctx.claudeMdFiles.join(', '));
+      parts.push(`config (${ctx.claudeMdCount}): ${ctx.claudeMdFiles.join(', ')}`);
     } else {
       parts.push(`${ctx.claudeMdCount} CLAUDE.md`);
     }
@@ -29,7 +29,7 @@ export function renderEnvironmentLine(ctx: RenderContext): string | null {
   if (ctx.rulesCount > 0) {
     if (verbose) {
       const ruleNames = ctx.rulesFiles.map(f => f.replace(/^.*\//, '').replace(/\.md$/, ''));
-      parts.push(`rules: ${ruleNames.join(', ')}`);
+      parts.push(`rules (${ctx.rulesCount}): ${ruleNames.join(', ')}`);
     } else {
       parts.push(`${ctx.rulesCount} rules`);
     }
@@ -37,7 +37,7 @@ export function renderEnvironmentLine(ctx: RenderContext): string | null {
 
   if (ctx.mcpCount > 0) {
     if (verbose) {
-      parts.push(`MCPs: ${ctx.mcpServers.join(', ')}`);
+      parts.push(`MCPs (${ctx.mcpCount}): ${ctx.mcpServers.join(', ')}`);
     } else {
       parts.push(`${ctx.mcpCount} MCPs`);
     }
@@ -45,7 +45,7 @@ export function renderEnvironmentLine(ctx: RenderContext): string | null {
 
   if (ctx.hooksCount > 0) {
     if (verbose) {
-      parts.push(`hooks: ${ctx.hooks.join(', ')}`);
+      parts.push(`hooks (${ctx.hooksCount}): ${ctx.hooks.join(', ')}`);
     } else {
       parts.push(`${ctx.hooksCount} hooks`);
     }

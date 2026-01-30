@@ -124,9 +124,9 @@ test('renderSessionLine displays config file names when showConfigFiles is true'
   ctx.config.display.showConfigFiles = true;
   const line = renderSessionLine(ctx);
   assert.ok(line.includes('~/.claude/CLAUDE.md'), 'should show CLAUDE.md file paths');
-  assert.ok(line.includes('rules: comments, test'), 'should show rule names without .md extension');
-  assert.ok(line.includes('MCPs: slack, linear, figma'), 'should show MCP server names');
-  assert.ok(line.includes('hooks: PreToolUse, PostToolUse'), 'should show hook names');
+  assert.ok(line.includes('rules (2): comments, test'), 'should show rule names without .md extension');
+  assert.ok(line.includes('MCPs (3): slack, linear, figma'), 'should show MCP server names');
+  assert.ok(line.includes('hooks (2): PreToolUse, PostToolUse'), 'should show hook names');
 });
 
 test('renderSessionLine displays project name from POSIX cwd', () => {

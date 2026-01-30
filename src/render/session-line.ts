@@ -101,7 +101,7 @@ export function renderSessionLine(ctx: RenderContext): string {
     if (totalCounts > 0 && totalCounts >= envThreshold) {
       if (ctx.claudeMdCount > 0) {
         if (verbose) {
-          parts.push(dim(ctx.claudeMdFiles.join(', ')));
+          parts.push(dim(`config (${ctx.claudeMdCount}): ${ctx.claudeMdFiles.join(', ')}`));
         } else {
           parts.push(dim(`${ctx.claudeMdCount} CLAUDE.md`));
         }
@@ -110,7 +110,7 @@ export function renderSessionLine(ctx: RenderContext): string {
       if (ctx.rulesCount > 0) {
         if (verbose) {
           const ruleNames = ctx.rulesFiles.map(f => f.replace(/^.*\//, '').replace(/\.md$/, ''));
-          parts.push(dim(`rules: ${ruleNames.join(', ')}`));
+          parts.push(dim(`rules (${ctx.rulesCount}): ${ruleNames.join(', ')}`));
         } else {
           parts.push(dim(`${ctx.rulesCount} rules`));
         }
@@ -118,7 +118,7 @@ export function renderSessionLine(ctx: RenderContext): string {
 
       if (ctx.mcpCount > 0) {
         if (verbose) {
-          parts.push(dim(`MCPs: ${ctx.mcpServers.join(', ')}`));
+          parts.push(dim(`MCPs (${ctx.mcpCount}): ${ctx.mcpServers.join(', ')}`));
         } else {
           parts.push(dim(`${ctx.mcpCount} MCPs`));
         }
@@ -126,7 +126,7 @@ export function renderSessionLine(ctx: RenderContext): string {
 
       if (ctx.hooksCount > 0) {
         if (verbose) {
-          parts.push(dim(`hooks: ${ctx.hooks.join(', ')}`));
+          parts.push(dim(`hooks (${ctx.hooksCount}): ${ctx.hooks.join(', ')}`));
         } else {
           parts.push(dim(`${ctx.hooksCount} hooks`));
         }
