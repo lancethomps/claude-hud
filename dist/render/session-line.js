@@ -1,3 +1,4 @@
+import * as os from 'os';
 import { isLimitReached } from '../types.js';
 import { getContextPercent, getBufferedPercent, getModelName } from '../stdin.js';
 import { coloredBar, cyan, dim, magenta, red, yellow, getContextColor, quotaBar, RESET } from './colors.js';
@@ -41,7 +42,7 @@ export function renderSessionLine(ctx) {
         const pathLevels = ctx.config?.pathLevels ?? 1;
         // Always join with forward slash for consistent display
         // Handle root path (/) which results in empty segments
-        const projectPath = pathLevels === -1 ? ctx.stdin.cwd : segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
+        const projectPath = pathLevels === -1 ? ctx.stdin.cwd.replace(os.homedir(), '~') : segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
         // Build git status string
         let gitPart = '';
         const gitConfig = ctx.config?.gitStatus;
